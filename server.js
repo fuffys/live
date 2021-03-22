@@ -12,15 +12,23 @@ app.use(express.static(path.join(__dirname, 'livechat')));
 
 // Run when client connects
 io.on('connection', socket => {
-    console.log('New WS Connection...');
 
-    socket.emit('message', 'Vítejte v Chatu');
+    //Welcome current user
+    socket.emit('message', 'Vítejte v Chatu!');
 
     //Broadcast when user connects
     socket.broadcast.emit('message', 'Uživatel se připojil');
 
-});
+    // Runs when client disconnects
+    socket.on('disconnect', () => {
+        io.emit('message', 'Uživatel se odpojil');
+    });
 
+    // Listen for chatMessage
+    socket.on('chatMessage', msg => {
+        io.emit('message', msg);
+    });
+});
 
 const PORT = 3000 || process.env.PORT;
 
